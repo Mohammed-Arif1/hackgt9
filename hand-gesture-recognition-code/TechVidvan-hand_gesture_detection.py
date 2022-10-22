@@ -7,6 +7,7 @@ import numpy as np
 import mediapipe as mp
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+import pyautogui
 
 # initialize mediapipe
 mpHands = mp.solutions.hands
@@ -30,6 +31,7 @@ print(classNames)
 cap = cv2.VideoCapture(0)
 
 while True:
+        
     # Read each frame from the webcam
     _, frame = cap.read()
 
