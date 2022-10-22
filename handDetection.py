@@ -41,6 +41,31 @@ class handDetector():
                     cv2.circle(img, (cx, cy), 7, (255, 0, 255), cv2.FILLED)
         return lmlist
 
+    def leftRight(self,img,handNo=0,draw=True):
+        leftOrRight='No Movement'
+        if self.results.multi_hand_landmarks:
+            myHand=self.results.multi_hand_landmarks[handNo]
+            for id, lm in enumerate(myHand.landmark):
+                h,w,c=img.shape
+                cx,cy=int(lm.x*w),int(lm.y*h)
+                if cx<350:
+                    leftOrRight='left'
+                else:
+                    leftOrRight='right'
+        return leftOrRight
+    
+    def upDown(self,img,handNo=0,draw=True):
+        upDown='No Movement'
+        if self.results.multi_hand_landmarks:
+            myHand=self.results.multi_hand_landmarks[handNo]
+            for id, lm in enumerate(myHand.landmark):
+                h,w,c=img.shape
+                cx,cy=int(lm.x*w),int(lm.y*h)
+                if cy<250:
+                    upDown='up'
+                else:
+                    upDown='down'
+        return upDown
 
 def main():
     pTime = 0
@@ -53,25 +78,29 @@ def main():
         img = cv2.flip(img, 1)
         img = detector.findHands(img)
         lmlist = detector.findPosition(img)
-        lmlist1 = detector.findPosition(img, handNo=1)
+        leftOrRight=detector.leftRight(img)
+        upOrDown=detector.upDown(img)
+        #lmlist1 = detector.findPosition(img, handNo=1)
         if len(lmlist) != 0:
             #print(lmlist)
             print("Hand 1:",lmlist)
             file=open("lmlist", 'w' )
             file.write(str(lmlist))
             file.close()
-        if (len(lmlist1)) !=0:
+        #if (len(lmlist1)) !=0:
             #print(lmlist)
-            print("Hand 2:",lmlist1)
-            file=open("lmlist1", 'w' )
-            file.write(str(lmlist1))
-            file.close()
+        #    print("Hand 2:",lmlist1)
+         #   file=open("lmlist1", 'w' )
+          #  file.write(str(lmlist1))
+           # file.close()
 
         cTime = time.time()
         fps = 1 / (cTime - pTime)
         pTime = cTime
 
-        cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 255), 3)
+        cv2.putText(img, str(int(fps)), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 255), 3)
+        cv2.putText(img, str(leftOrRight),(10,100),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
+        cv2.putText(img, str(upOrDown),(10,150),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
 
 
         cv2.imshow("Image", img)
