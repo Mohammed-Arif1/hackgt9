@@ -12,44 +12,68 @@ pdi.FAILSAFE = True
 class StardewValleyCommands():
 
     def __init__(self):
-        self._up = 'w'
-        self._down = 's'
-        self._left = 'a'
-        self._right = 'd'
-        self._map = 'm'
+        self._up = 'w'          # if you keep your hand up
+        self._down = 's'        # if you keep your hand down
+        self._left = 'a'        # if you keep your hand on the left
+        self._right = 'd'       # if you keep your hand on the right
+        self._map = 'm'         
         self._menu = 'e'
         self._journal = 'f'
         self._leftclick = 'c'
         self._rightclick = 'x'
         self._esc = 'esc'
-        self._one = '1'
-        self._two = '2'
-        self._three = '3'
-        self._four = '4'
-        self._five = '5'
-        self._six ='6'
-        self._seven = '7'
-        self._eight = '8'
-        self._nine = '9'
-        self._zero = '0'
+        self._one = '1'         # hold up 1 finger
+        self._two = '2'         # hold up 2 fingers
+        self._three = '3'       # hold up 3 fingers
+        self._four = '4'        # hold up 4 fingers
+        self._five = '5'        # hold up 5 fingers
+        self._six ='6'          # hold up 6 fingers
+        self._seven = '7'       # hold up 7 fingers
+        self._eight = '8'       # hold up 8 fingers
+        self._nine = '9'        # hold up 9 fingers
+        self._zero = '0'        # hold up 10 fingers
         self._minus = '-'
         self._equals = '='
 
     """ Stardew Valley Commands """
-    def moveup(self):
+    def moveUp(self):
         pdi.keyDown(self._up)
         pdi.keyUp(self._up)
 
-    def movedown(self):
+    def holdUp(self):
+        pdi.keyDown(self._up)
+    
+    def stopMovingUp(self):
+        pdi.keyUp(self._up)
+
+    def moveDown(self):
         pdi.keyDown(self._down)
         pdi.keyUp(self._down)
 
-    def moveleft(self):
+    def holdDown(self):
+        pdi.keyDown(self._down)
+    
+    def stopMovingDown(self):
+        pdi.keyUp(self._down)
+
+    def moveLeft(self):
         pdi.keyDown(self._left)
         pdi.keyUp(self._left)
 
-    def moveright(self):
+    def holdLeft(self):
+        pdi.keyDown(self._left)
+    
+    def stopMovingLeft(self):
+        pdi.keyUp(self._left)
+
+    def moveRight(self):
         pdi.keyDown(self._right)
+        pdi.keyUp(self._right)
+
+    def holdRight(self):
+        pdi.keyDown(self._right)
+    
+    def stopMovingRight(self):
         pdi.keyUp(self._right)
 
     def openmap(self):
