@@ -53,9 +53,19 @@ def main():
         img = cv2.flip(img, 1)
         img = detector.findHands(img)
         lmlist = detector.findPosition(img)
+        lmlist1 = detector.findPosition(img, handNo=1)
         if len(lmlist) != 0:
             #print(lmlist)
-            print(lmlist[4])
+            print("Hand 1:",lmlist)
+            file=open("lmlist", 'w' )
+            file.write(str(lmlist))
+            file.close()
+        if (len(lmlist1)) !=0:
+            #print(lmlist)
+            print("Hand 2:",lmlist1)
+            file=open("lmlist1", 'w' )
+            file.write(str(lmlist1))
+            file.close()
 
         cTime = time.time()
         fps = 1 / (cTime - pTime)
