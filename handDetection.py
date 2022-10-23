@@ -6,16 +6,18 @@ import gesturePrediction as gP
 
 
 class handDetector():
-    def __init__(self, mode=False, maxHands=2, detectionCon=1, trackCon=1):
+    def __init__(self, capture, mode=False, maxHands=2, detectionCon=1, trackCon=1):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
         self.trackCon = trackCon
+        self.width = capture.get(3)
+        self.height = capture.get(4)
 
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands(static_image_mode=False,
                       max_num_hands=2,
-                      min_detection_confidence=0.5,
+                      min_detection_confidence=0.7,
                       min_tracking_confidence=0.5)
         self.mpDraw = mp.solutions.drawing_utils
 
@@ -47,26 +49,35 @@ class handDetector():
         leftOrRight='No Movement'
         if self.results.multi_hand_landmarks:
             myHand=self.results.multi_hand_landmarks[handNo]
-            for id, lm in enumerate(myHand.landmark):
-                h,w,c=img.shape
-                cx,cy=int(lm.x*w),int(lm.y*h)
-                if cx<350:
-                    leftOrRight='left'
-                else:
-                    leftOrRight='right'
+            cx, cy = int(myHand.landmark[0].x*self.width + myHand.landmark[9].x*self.width) / 2, int(myHand.landmark[0].y*self.height + myHand.landmark[9].y*self.height)/2
+            if cx<self.width/3:
+                leftOrRight='left'
+            elif cx>2*self.width/3:
+                leftOrRight='right'
+            #print(myHand.landmark[0].x*self.width)
+            #print(myHand.landmark[9].x*self.width)
+            #print(cx)
+            #print(self.width/3)
+            #print(2*self.width/3)
+            #print("--------")
+        #print("LOR", leftOrRight)
         return leftOrRight
     
     def upDown(self,img,handNo=0,draw=True):
         upDown='No Movement'
         if self.results.multi_hand_landmarks:
             myHand=self.results.multi_hand_landmarks[handNo]
-            for id, lm in enumerate(myHand.landmark):
-                h,w,c=img.shape
-                cx,cy=int(lm.x*w),int(lm.y*h)
-                if cy<250:
-                    upDown='up'
-                else:
-                    upDown='down'
+            #print("yval", myHand.landmark[0].y)
+            cx, cy = int(myHand.landmark[0].x*self.width + myHand.landmark[9].x*self.width) / 2, int(myHand.landmark[0].y*self.height + myHand.landmark[9].y*self.height)/2
+            if cy<self.height/3:
+                upDown='up'
+            elif cy > 2*self.height/3:
+                upDown='down'
+            #print(cy)
+            #print(self.height/3)
+            #print(2*self.height/3)
+            #print("------------")
+        #print("UOD", upDown)
         return upDown
 
 def main():
