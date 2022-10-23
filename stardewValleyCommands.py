@@ -92,6 +92,12 @@ class StardewValleyCommands():
     def leftclick(self):
         pdi.click()
 
+    def holdTool(self):
+        pdi.keyDown(self._leftclick)
+
+    def stopTool(self):
+        pdi.keyUp(self._leftclick)
+
     def rightclick(self):
         pdi.keyDown(self._rightclick)
         pdi.keyUp(self._rightclick)

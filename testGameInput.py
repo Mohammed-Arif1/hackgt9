@@ -45,9 +45,10 @@ def main():
                 currLeftRight = dir.INIT
                 prevUpDown = dir.INIT
                 prevLeftRight = dir.INIT
-                
-        leftOrRight = detector.leftRight(img)
-        upOrDown = detector.upDown(img)
+        _, hand_dict, _ = detector.multiHand(img)
+        leftOrRight = detector.leftRight(img,hand_dict)
+        upOrDown = detector.upDown(img, hand_dict)
+        useTool = detector.useTool(hand_dict)
         
 
 
@@ -72,13 +73,13 @@ def main():
             currLeftRight = dir.INIT
 
         
-        t = Thread(target=keyPress, args=(currUpDown, prevUpDown,currLeftRight, prevLeftRight, person))
+        t = Thread(target=keyPress, args=(currUpDown, prevUpDown,currLeftRight, prevLeftRight, person, useTool))
         #t2 = Thread(target=keyPressLeftRight, args=(currLeftRight, prevLeftRight, person))
         t.start()
         prevLeftRight = currLeftRight
         prevUpDown = currUpDown
         #p.join()
-def keyPress(currUpDown, prevUpDown, currLeftRight, prevLeftRight, person):
+def keyPress(currUpDown, prevUpDown, currLeftRight, prevLeftRight, person, useTool):
     #stopMoving = False
     if (currUpDown != prevUpDown):
         person.stopMovingDown()
@@ -108,6 +109,10 @@ def keyPress(currUpDown, prevUpDown, currLeftRight, prevLeftRight, person):
             print("holdright")
             person.holdRight()
             #person.moveRight()
+    if (useTool):
+        person.holdTool()
+    else:
+        person.stopTool()
 #def keyPressLeftRight(currLeftRight, prevLeftRight, person):
 
 
