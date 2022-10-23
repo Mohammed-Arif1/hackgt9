@@ -12,6 +12,7 @@ pdi.FAILSAFE = True
 class StardewValleyCommands():
 
     def __init__(self):
+        
         self._up = 'w'          # if you keep your hand up
         self._down = 's'        # if you keep your hand down
         self._left = 'a'        # if you keep your hand on the left

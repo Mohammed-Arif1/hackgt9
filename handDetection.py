@@ -45,6 +45,29 @@ class handDetector():
                     cv2.circle(img, (cx, cy), 7, (255, 0, 255), cv2.FILLED)
         return lmlist
 
+    def multiHand(self,img):
+        handedness_dict = {}
+        hand_num = 0
+        i = 0
+        x, y, c = img.shape
+        multi_lmlist = []
+        if self.results.multi_hand_landmarks:
+            for handslms in self.results.multi_hand_landmarks:
+                multi_lmlist.append([])
+                for lm in handslms.landmark:
+                    lmx = (int(lm.x * x))
+                    lmy = (int(lm.y * y))
+                    multi_lmlist[-1].append([lmx, lmy])
+                    
+                handType = self.results.multi_handedness[i].classification[0].label
+                i+=1
+                handedness_dict[hand_num] = [handType]
+                hand_num+=1
+
+        return multi_lmlist, handedness_dict
+
+
+
     def leftRight(self,img,handNo=0,draw=True):
         leftOrRight='No Movement'
         if self.results.multi_hand_landmarks:
@@ -84,8 +107,8 @@ def main():
     pTime = 0
     cTime = 0
     cap = cv2.VideoCapture(0)
-    detector = handDetector()
-    model = gP.getModel()
+    detector = handDetector(cap)
+    model, classNames = gP.getModel()
     
 
     while True:
@@ -93,7 +116,9 @@ def main():
         img = cv2.flip(img, 1)
         img = detector.findHands(img)
         lmlist = detector.findPosition(img)
-        
+        multi_lmlist, hand_dict = detector.multiHand(img)
+        #print(len(hand_dict))
+        #print("hand_dict: ",hand_dict)
         leftOrRight=detector.leftRight(img)
         upOrDown=detector.upDown(img)
         #lmlist1 = detector.findPosition(img, handNo=1)
@@ -103,10 +128,18 @@ def main():
             file=open("lmlist", 'w' )
             file.write(str(lmlist))
             file.close()
-            gestureName = gP.getGestures(lmlist)
+
+            if len(multi_lmlist) == 2:
+                gestureName1 = gP.getGestures(multi_lmlist[0], model, classNames)
+                gestureName2 = gP.getGestures(multi_lmlist[1], model, classNames)
+
+                hand_dict[0].append(gestureName1)
+                hand_dict[1].append(gestureName2)
+                print(hand_dict)
+            
             #print("Normal:",lmlist)
             #print("numpy array:",[np.ndarray.tolist(np.array(lmlist)[:,1:3])])
-            cv2.putText(img, str(gestureName),(10,200),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
+            #cv2.putText(img, str(gestureName),(10,200),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
         #if (len(lmlist1)) !=0:
             #print(lmlist)
         #    print("Hand 2:",lmlist1)
