@@ -9,7 +9,7 @@ import handDetection
 from enum import Enum
 from threading import Thread
 
-class upDown(Enum):
+class dir(Enum):
     INIT = 0
     UP = 1
     DOWN = 2
@@ -17,10 +17,10 @@ class upDown(Enum):
     LEFT = 4
 
 def main():
-    currUpDown = upDown.INIT
-    currLeftRight = upDown.INIT
-    prevUpDown = upDown.INIT
-    prevLeftRight = upDown.INIT
+    currUpDown = dir.INIT
+    currLeftRight = dir.INIT
+    prevUpDown = dir.INIT
+    prevLeftRight = dir.INIT
     person = stardewValleyCommands.StardewValleyCommands()
     detector = handDetection.handDetector()
     cap = cv2.VideoCapture(0)
@@ -41,6 +41,7 @@ def main():
                 #p.join()
             else:
                 th = Thread(target=stopMoving, args=(person))
+                
         leftOrRight = detector.leftRight(img)
         upOrDown = detector.upDown(img)
         
@@ -48,13 +49,13 @@ def main():
 
 
         if (upOrDown == 'up'):
-            currUpDown = UP
+            currUpDown = dir.UP
         elif upOrDown == 'down':
-            currUpDown = DOWN
+            currUpDown = dir.DOWN
         if leftOrRight == 'right':
-            currLeftRight = RIGHT
+            currLeftRight = dir.RIGHT
         elif leftOrRight == 'left':
-            currLeftRight = LEFT
+            currLeftRight = dir.LEFT
 
         
         t = Thread(target=keyPress, args=(currUpDown, prevUpDown, currLeftRight, prevLeftRight, person))
@@ -62,35 +63,37 @@ def main():
         prevLeftRight = currLeftRight
         prevUpDown = currUpDown
         #p.join()
+
+
 def keyPress(currUpDown, prevUpDown, currLeftRight, prevLeftRight, person):
     #stopMoving = False
     if (currUpDown != prevUpDown):
         person.stopMovingDown()
         person.stopMovingUp()
-        if (currUpDown == UP):
+        if (currUpDown == dir.UP):
             person.holdUp()
             #person.moveUp()
-        elif currUpDown == DOWN:
+        elif currUpDown == dir.DOWN:
             person.holdDown()
             #person.moveDown()
     #print(currLeftRight)
     if (currLeftRight != prevLeftRight):
-        print(currLeftRight)
+        #print(currLeftRight)
         person.stopMovingLeft()
         person.stopMovingRight()
         #time.sleep(1)
-        if (currLeftRight == LEFT):
+        if (currLeftRight == dir.LEFT):
             person.holdLeft()
             #person.moveLeft()
-        elif currLeftRight == RIGHT:
+        elif currLeftRight == dir.RIGHT:
             person.holdRight()
             #person.moveRight()
 
 
 
 def stopMoving(person):
-        #person.stopMovingDown()
-        #person.stopMovingUp()
+        person.stopMovingDown()
+        person.stopMovingUp()
         person.stopMovingLeft()
         person.stopMovingRight()
             
