@@ -38,14 +38,15 @@ def main():
             if len(lmlist) != 0:
                 noHand = False
             else:
-                th = Thread(target=stopMoving, args=(person))
+                #print("no hands detected")
+                th = Thread(target=stopMoving, args=(person,))
+                th.start()
+                currUpDown = dir.INIT
+                currLeftRight = dir.INIT
+                prevUpDown = dir.INIT
+                prevLeftRight = dir.INIT
                 
         leftOrRight = detector.leftRight(img)
-        # Handle mirrored camera
-        if leftOrRight == "right":
-            leftOrRight = "left"
-        elif leftOrRight == "left":
-            leftOrRight = "right"
         upOrDown = detector.upDown(img)
         
 
@@ -53,26 +54,31 @@ def main():
 
         if (upOrDown == 'up'):
             currUpDown = dir.UP
+            print("up")
         elif upOrDown == 'down':
             currUpDown = dir.DOWN
+            print("down")
         elif upOrDown == 'No Movement':
             currUpDown = dir.INIT
+            print("none-ud")
         if leftOrRight == 'right':
             currLeftRight = dir.RIGHT
+            print("right")
         elif leftOrRight == 'left':
             currLeftRight = dir.LEFT
+            print("left")
         elif leftOrRight == "No Movement":
+            print("none-lr")
             currLeftRight = dir.INIT
 
         
-        t = Thread(target=keyPressUpDown, args=(currUpDown, prevUpDown, person))
-        t2 = Thread(target=keyPressLeftRight, args=(currLeftRight, prevLeftRight, person))
+        t = Thread(target=keyPress, args=(currUpDown, prevUpDown,currLeftRight, prevLeftRight, person))
+        #t2 = Thread(target=keyPressLeftRight, args=(currLeftRight, prevLeftRight, person))
         t.start()
-        t2.start()
         prevLeftRight = currLeftRight
         prevUpDown = currUpDown
         #p.join()
-def keyPressUpDown(currUpDown, prevUpDown, person):
+def keyPress(currUpDown, prevUpDown, currLeftRight, prevLeftRight, person):
     #stopMoving = False
     if (currUpDown != prevUpDown):
         person.stopMovingDown()
@@ -84,19 +90,26 @@ def keyPressUpDown(currUpDown, prevUpDown, person):
             person.holdDown()
             #person.moveDown()
     #print(currLeftRight)
-def keyPressLeftRight(currLeftRight, prevLeftRight, person):
     if (currLeftRight != prevLeftRight):
         #print(currLeftRight)
         #stopMoving(person)
         person.stopMovingLeft()
         person.stopMovingRight()
-        #time.sleep(1)
+        time.sleep(0.2)
+        #print("---------------------------")
+        #print(currLeftRight)
+        #print(prevLeftRight)
+        #print("----------------------------")
         if (currLeftRight == dir.LEFT):
+            print("hold left")
             person.holdLeft()
             #person.moveLeft()
         elif currLeftRight == dir.RIGHT:
+            print("holdright")
             person.holdRight()
             #person.moveRight()
+#def keyPressLeftRight(currLeftRight, prevLeftRight, person):
+
 
 
 
@@ -106,7 +119,7 @@ def stopMoving(person):
         person.stopMovingUp()
         person.stopMovingLeft()
         person.stopMovingRight()
-            
+
 
         
 
