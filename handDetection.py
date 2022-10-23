@@ -46,7 +46,8 @@ class handDetector():
         return lmlist
 
     def multiHand(self,img):
-        handedness_dict = {}
+        hand_dict = {}
+        hand_order_list = []
         hand_num = 0
         i = 0
         x, y, c = img.shape
@@ -61,17 +62,22 @@ class handDetector():
                     
                 handType = self.results.multi_handedness[i].classification[0].label
                 i+=1
-                handedness_dict[hand_num] = [handType]
+                hand_dict[handType] = hand_num
+                hand_order_list.append(handType)
                 hand_num+=1
 
-        return multi_lmlist, handedness_dict
+        return multi_lmlist, hand_dict, hand_order_list
 
 
 
-    def leftRight(self,img,handNo=0,draw=True):
+    def leftRight(self,img, hand_dict, handNo=0,draw=True):
         leftOrRight='No Movement'
+        
         if self.results.multi_hand_landmarks:
-            myHand=self.results.multi_hand_landmarks[handNo]
+            if (len(hand_dict) == 1):
+                myHand=self.results.multi_hand_landmarks[handNo]
+            elif (len(hand_dict) == 2):
+                myHand=self.results.multi_hand_landmarks[hand_dict['Right']]
             cx, cy = int(myHand.landmark[0].x*self.width + myHand.landmark[9].x*self.width) / 2, int(myHand.landmark[0].y*self.height + myHand.landmark[9].y*self.height)/2
             if cx<self.width/3:
                 leftOrRight='left'
@@ -86,10 +92,13 @@ class handDetector():
         #print("LOR", leftOrRight)
         return leftOrRight
     
-    def upDown(self,img,handNo=0,draw=True):
+    def upDown(self,img, hand_dict, handNo=0,draw=True):
         upDown='No Movement'
         if self.results.multi_hand_landmarks:
-            myHand=self.results.multi_hand_landmarks[handNo]
+            if (len(hand_dict) == 1):
+                myHand=self.results.multi_hand_landmarks[handNo]
+            elif (len(hand_dict) == 2):
+                myHand=self.results.multi_hand_landmarks[hand_dict['Right']]
             #print("yval", myHand.landmark[0].y)
             cx, cy = int(myHand.landmark[0].x*self.width + myHand.landmark[9].x*self.width) / 2, int(myHand.landmark[0].y*self.height + myHand.landmark[9].y*self.height)/2
             if cy<self.height/3:
@@ -102,6 +111,10 @@ class handDetector():
             #print("------------")
         #print("UOD", upDown)
         return upDown
+
+    def useTool(self,hand_dict):
+        if len(hand_dict) > 1:
+            return True
 
 def main():
     pTime = 0
@@ -116,11 +129,14 @@ def main():
         img = cv2.flip(img, 1)
         img = detector.findHands(img)
         lmlist = detector.findPosition(img)
-        multi_lmlist, hand_dict = detector.multiHand(img)
+        multi_lmlist, hand_dict, hand_order_list = detector.multiHand(img)
+        #print("Hand order list: ",hand_order_list)
         #print(len(hand_dict))
         #print("hand_dict: ",hand_dict)
-        leftOrRight=detector.leftRight(img)
-        upOrDown=detector.upDown(img)
+        leftOrRight=detector.leftRight(img, hand_dict)
+        upOrDown=detector.upDown(img, hand_dict)
+        useTool = detector.useTool(hand_dict)
+        print([leftOrRight,upOrDown,useTool])
         #lmlist1 = detector.findPosition(img, handNo=1)
         if len(lmlist) != 0:
             #print(lmlist)
@@ -129,13 +145,13 @@ def main():
             file.write(str(lmlist))
             file.close()
 
-            if len(multi_lmlist) == 2:
-                gestureName1 = gP.getGestures(multi_lmlist[0], model, classNames)
-                gestureName2 = gP.getGestures(multi_lmlist[1], model, classNames)
+            #if len(multi_lmlist) == 2:
+                #gestureName1 = gP.getGestures(multi_lmlist[0], model, classNames)
+                #gestureName2 = gP.getGestures(multi_lmlist[1], model, classNames)
 
-                hand_dict[0].append(gestureName1)
-                hand_dict[1].append(gestureName2)
-                print(hand_dict)
+                #hand_dict[hand_dict[0]].append(gestureName1)
+                #hand_dict[hand_dict[1]].append(gestureName2)
+                #print(hand_dict)
             
             #print("Normal:",lmlist)
             #print("numpy array:",[np.ndarray.tolist(np.array(lmlist)[:,1:3])])
