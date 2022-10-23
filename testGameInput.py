@@ -31,6 +31,7 @@ def main():
         noHand = True
         while noHand:
             success, img = cap.read()
+            img = cv2.flip(img, 1)
             img = detector.findHands(img)
             lmlist = detector.findPosition(img)
             cv2.imshow("Image", img)
