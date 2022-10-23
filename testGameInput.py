@@ -1,15 +1,13 @@
 from pickle import TRUE
 import cv2
 from multiprocessing import Process
-from matplotlib.sankey import DOWN, UP
-from pyautogui import LEFT, RIGHT
 import stardewValleyCommands
 import time
 import handDetection
 from enum import Enum
 from threading import Thread
 
-class upDown(Enum):
+class dir(Enum):
     INIT = 0
     UP = 1
     DOWN = 2
@@ -17,10 +15,10 @@ class upDown(Enum):
     LEFT = 4
 
 def main():
-    currUpDown = upDown.INIT
-    currLeftRight = upDown.INIT
-    prevUpDown = upDown.INIT
-    prevLeftRight = upDown.INIT
+    currUpDown = dir.INIT
+    currLeftRight = dir.INIT
+    prevUpDown = dir.INIT
+    prevLeftRight = dir.INIT
     person = stardewValleyCommands.StardewValleyCommands()
 
     cap = cv2.VideoCapture(0)
@@ -32,6 +30,7 @@ def main():
         noHand = True
         while noHand:
             success, img = cap.read()
+            img = cv2.flip(img, 1)
             img = detector.findHands(img)
             lmlist = detector.findPosition(img)
             cv2.imshow("Image", img)
@@ -40,6 +39,7 @@ def main():
                 noHand = False
             else:
                 th = Thread(target=stopMoving, args=(person))
+                
         leftOrRight = detector.leftRight(img)
         # Handle mirrored camera
         if leftOrRight == "right":
@@ -52,17 +52,17 @@ def main():
 
 
         if (upOrDown == 'up'):
-            currUpDown = UP
+            currUpDown = dir.UP
         elif upOrDown == 'down':
-            currUpDown = DOWN
+            currUpDown = dir.DOWN
         elif upOrDown == 'No Movement':
-            currUpDown = 'No Movement'
+            currUpDown = dir.INIT
         if leftOrRight == 'right':
-            currLeftRight = RIGHT
+            currLeftRight = dir.RIGHT
         elif leftOrRight == 'left':
-            currLeftRight = LEFT
+            currLeftRight = dir.LEFT
         elif leftOrRight == "No Movement":
-            currLeftRight = "No Movement"
+            currLeftRight = dir.INIT
 
         
         t = Thread(target=keyPressUpDown, args=(currUpDown, prevUpDown, person))
@@ -77,10 +77,10 @@ def keyPressUpDown(currUpDown, prevUpDown, person):
     if (currUpDown != prevUpDown):
         person.stopMovingDown()
         person.stopMovingUp()
-        if (currUpDown == UP):
+        if (currUpDown == dir.UP):
             person.holdUp()
             #person.moveUp()
-        elif currUpDown == DOWN:
+        elif currUpDown == dir.DOWN:
             person.holdDown()
             #person.moveDown()
     #print(currLeftRight)
@@ -91,10 +91,10 @@ def keyPressLeftRight(currLeftRight, prevLeftRight, person):
         person.stopMovingLeft()
         person.stopMovingRight()
         #time.sleep(1)
-        if (currLeftRight == LEFT):
+        if (currLeftRight == dir.LEFT):
             person.holdLeft()
             #person.moveLeft()
-        elif currLeftRight == RIGHT:
+        elif currLeftRight == dir.RIGHT:
             person.holdRight()
             #person.moveRight()
 
