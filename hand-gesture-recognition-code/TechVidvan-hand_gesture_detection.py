@@ -98,6 +98,7 @@ while True:
 
             # Predict gesture
             prediction = model.predict([landmarks])
+            print([landmarks],', ',type(landmarks))
             #print(prediction)
             classID = np.argmax(prediction)
             className = classNames[classID]

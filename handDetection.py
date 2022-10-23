@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
+import numpy as np
 import time
+import gesturePrediction as gP
 
 
 class handDetector():
@@ -36,7 +38,7 @@ class handDetector():
             for id, lm in enumerate(myHand.landmark):
                 h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
-                lmlist.append([id, cx, cy])
+                lmlist.append([cx, cy])
                 if draw:
                     cv2.circle(img, (cx, cy), 7, (255, 0, 255), cv2.FILLED)
         return lmlist
@@ -72,21 +74,28 @@ def main():
     cTime = 0
     cap = cv2.VideoCapture(0)
     detector = handDetector()
+    model = gP.getModel()
+    
 
     while True:
         success, img = cap.read()
         img = cv2.flip(img, 1)
         img = detector.findHands(img)
         lmlist = detector.findPosition(img)
+        
         leftOrRight=detector.leftRight(img)
         upOrDown=detector.upDown(img)
         #lmlist1 = detector.findPosition(img, handNo=1)
         if len(lmlist) != 0:
             #print(lmlist)
-            print("Hand 1:",lmlist)
+            #print("Hand 1:",lmlist)
             file=open("lmlist", 'w' )
             file.write(str(lmlist))
             file.close()
+            gestureName = gP.getGestures(lmlist)
+            #print("Normal:",lmlist)
+            #print("numpy array:",[np.ndarray.tolist(np.array(lmlist)[:,1:3])])
+            cv2.putText(img, str(gestureName),(10,200),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
         #if (len(lmlist1)) !=0:
             #print(lmlist)
         #    print("Hand 2:",lmlist1)
@@ -101,6 +110,7 @@ def main():
         cv2.putText(img, str(int(fps)), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 255), 3)
         cv2.putText(img, str(leftOrRight),(10,100),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
         cv2.putText(img, str(upOrDown),(10,150),cv2.FONT_HERSHEY_PLAIN,3,(255,0,255),3)
+        
 
 
         cv2.imshow("Image", img)
